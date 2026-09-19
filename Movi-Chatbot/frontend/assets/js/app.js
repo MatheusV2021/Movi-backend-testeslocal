@@ -4,25 +4,19 @@ const campo = document.querySelector('#messageInput');
 const recentes = document.querySelector('#recentList');
 const busca = document.querySelector('#searchInput');
 
-const API_URL = 'https://movi-backend-testeslocal.onrender.com';
-
+const API_URL = 'http://127.0.0.1:8000';
 
 /* ========================= */
 /* SUPABASE                  */
 /* ========================= */
 
-const SUPABASE_URL =
-  'https://ttawjrbcrvizciydcldn.supabase.co';
+const SUPABASE_URL = 'https://ttawjrbcrvizciydcldn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hk3TQhTWVNdMHxG0-rl_ww_wXwdjzSZ';
 
-const SUPABASE_KEY =
-  'sb_publishable_hk3TQhTWVNdMHxG0-rl_ww_wXwdjzSZ';
-
-const supabaseClient =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
 let usuarioAtual = null;
 let conversaAtual = null;
@@ -35,7 +29,6 @@ let mensagensAtuais = [];
 /* ========================= */
 
 function horaAgora() {
-
   return new Date().toLocaleTimeString(
     'pt-BR',
     {
@@ -43,12 +36,10 @@ function horaAgora() {
       minute: '2-digit'
     }
   );
-
 }
 
 
 function formatarHora(data) {
-
   if (!data) {
     return horaAgora();
   }
@@ -60,25 +51,19 @@ function formatarHora(data) {
       minute: '2-digit'
     }
   );
-
 }
 
 
 function escaparHTML(texto) {
+  const elemento = document.createElement('div');
 
-  const elemento =
-    document.createElement('div');
-
-  elemento.textContent =
-    texto || '';
+  elemento.textContent = texto || '';
 
   return elemento.innerHTML;
-
 }
 
 
 function formatarResposta(texto) {
-
   return `
     <p>
       ${
@@ -87,12 +72,10 @@ function formatarResposta(texto) {
       }
     </p>
   `;
-
 }
 
 
 function mensagemInicial() {
-
   return `
     <h3>Olá! Sou o Movi! 👋</h3>
 
@@ -106,12 +89,10 @@ function mensagemInicial() {
       O que você gostaria de saber hoje?
     </p>
   `;
-
 }
 
 
 function mensagemSemLogin() {
-
   return `
     <div class="message-row">
 
@@ -142,12 +123,10 @@ function mensagemSemLogin() {
 
     </div>
   `;
-
 }
 
 
 function avatarMovi() {
-
   return `
     <div class="bot-avatar">
 
@@ -159,7 +138,6 @@ function avatarMovi() {
 
     </div>
   `;
-
 }
 
 
@@ -168,20 +146,15 @@ function avatarMovi() {
 /* ========================= */
 
 async function carregarConversas() {
-
   if (!usuarioAtual) {
-
     conversas = [];
-
     conversaAtual = null;
 
     renderizarRecentes();
     renderizarMensagens();
 
     return;
-
   }
-
 
   const {
     data,
@@ -197,58 +170,39 @@ async function carregarConversas() {
         }
       );
 
-
   if (error) {
-
     console.error(
       'Erro ao carregar conversas:',
       error
     );
 
     return;
-
   }
 
-
-  conversas =
-    data || [];
-
+  conversas = data || [];
 
   if (conversas.length > 0) {
-
-    conversaAtual =
-      conversas[0].id;
+    conversaAtual = conversas[0].id;
 
     await carregarMensagens(
       conversaAtual
     );
-
   } else {
-
     conversaAtual = null;
-
     mensagensAtuais = [];
 
     renderizarMensagens();
-
   }
 
-
   renderizarRecentes();
-
 }
 
 
 async function criarConversa() {
-
   if (!usuarioAtual) {
-
     abrirAuth('login');
-
     return;
-
   }
-
 
   const {
     data,
@@ -257,20 +211,13 @@ async function criarConversa() {
     await supabaseClient
       .from('conversations')
       .insert({
-
-        user_id:
-          usuarioAtual.id,
-
-        title:
-          'Nova conversa'
-
+        user_id: usuarioAtual.id,
+        title: 'Nova conversa'
       })
       .select()
       .single();
 
-
   if (error) {
-
     console.error(
       'Erro ao criar conversa:',
       error
@@ -281,38 +228,26 @@ async function criarConversa() {
     );
 
     return;
-
   }
 
-
-  conversaAtual =
-    data.id;
-
-
+  conversaAtual = data.id;
   mensagensAtuais = [];
 
-
-  conversas.unshift(
-    data
-  );
-
+  conversas.unshift(data);
 
   renderizarRecentes();
   renderizarMensagens();
 
   campo.focus();
-
 }
 
 
 async function selecionarConversa(id) {
-
   conversaAtual = id;
 
   await carregarMensagens(id);
 
   renderizarRecentes();
-
 }
 
 
@@ -320,38 +255,28 @@ async function atualizarTituloConversa(
   id,
   titulo
 ) {
-
   const {
     error
   } =
     await supabaseClient
       .from('conversations')
       .update({
-
-        title:
-          titulo,
-
-        updated_at:
-          new Date().toISOString()
-
+        title: titulo,
+        updated_at: new Date().toISOString()
       })
       .eq(
         'id',
         id
       );
 
-
   if (error) {
-
     console.error(
       'Erro ao atualizar título:',
       error
     );
 
     return;
-
   }
-
 
   const conversa =
     conversas.find(
@@ -359,28 +284,19 @@ async function atualizarTituloConversa(
         item.id === id
     );
 
-
   if (conversa) {
-
-    conversa.title =
-      titulo;
-
+    conversa.title = titulo;
     conversa.updated_at =
       new Date().toISOString();
-
   }
 
-
   renderizarRecentes();
-
 }
 
 
 async function atualizarDataConversa(id) {
-
   const dataAtual =
     new Date().toISOString();
-
 
   const {
     error
@@ -388,28 +304,21 @@ async function atualizarDataConversa(id) {
     await supabaseClient
       .from('conversations')
       .update({
-
-        updated_at:
-          dataAtual
-
+        updated_at: dataAtual
       })
       .eq(
         'id',
         id
       );
 
-
   if (error) {
-
     console.error(
       'Erro ao atualizar conversa:',
       error
     );
 
     return;
-
   }
-
 
   const conversa =
     conversas.find(
@@ -417,14 +326,87 @@ async function atualizarDataConversa(id) {
         item.id === id
     );
 
-
   if (conversa) {
+    conversa.updated_at = dataAtual;
+  }
+}
 
-    conversa.updated_at =
-      dataAtual;
 
+/* ========================= */
+/* EXCLUIR CONVERSA          */
+/* ========================= */
+
+async function excluirConversa(id) {
+  if (!usuarioAtual) {
+    return;
   }
 
+  const conversa =
+    conversas.find(
+      item =>
+        item.id === id
+    );
+
+  if (!conversa) {
+    return;
+  }
+
+  const confirmar =
+    window.confirm(
+      `Deseja excluir a conversa "${conversa.title}"?`
+    );
+
+  if (!confirmar) {
+    return;
+  }
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from('conversations')
+      .delete()
+      .eq(
+        'id',
+        id
+      );
+
+  if (error) {
+    console.error(
+      'Erro ao excluir conversa:',
+      error
+    );
+
+    alert(
+      'Não foi possível excluir a conversa.'
+    );
+
+    return;
+  }
+
+  conversas =
+    conversas.filter(
+      item =>
+        item.id !== id
+    );
+
+  if (conversaAtual === id) {
+    if (conversas.length > 0) {
+      conversaAtual =
+        conversas[0].id;
+
+      await carregarMensagens(
+        conversaAtual
+      );
+    } else {
+      conversaAtual = null;
+      mensagensAtuais = [];
+
+      renderizarMensagens();
+    }
+  }
+
+  renderizarRecentes();
 }
 
 
@@ -435,11 +417,9 @@ async function atualizarDataConversa(id) {
 async function carregarMensagens(
   conversaId
 ) {
-
   if (!usuarioAtual) {
     return;
   }
-
 
   const {
     data,
@@ -459,9 +439,7 @@ async function carregarMensagens(
         }
       );
 
-
   if (error) {
-
     console.error(
       'Erro ao carregar mensagens:',
       error
@@ -472,16 +450,11 @@ async function carregarMensagens(
     renderizarMensagens();
 
     return;
-
   }
 
-
-  mensagensAtuais =
-    data || [];
-
+  mensagensAtuais = data || [];
 
   renderizarMensagens();
-
 }
 
 
@@ -490,7 +463,6 @@ async function salvarMensagem(
   role,
   content
 ) {
-
   const {
     data,
     error
@@ -498,7 +470,6 @@ async function salvarMensagem(
     await supabaseClient
       .from('messages')
       .insert({
-
         conversation_id:
           conversaId,
 
@@ -510,26 +481,20 @@ async function salvarMensagem(
 
         content:
           content
-
       })
       .select()
       .single();
 
-
   if (error) {
-
     console.error(
       'Erro ao salvar mensagem:',
       error
     );
 
     throw error;
-
   }
 
-
   return data;
-
 }
 
 
@@ -538,88 +503,142 @@ async function salvarMensagem(
 /* ========================= */
 
 function renderizarRecentes() {
-
   recentes.innerHTML = '';
-
 
   if (!usuarioAtual) {
     return;
   }
 
-
   conversas
     .slice(0, 7)
     .forEach(conversa => {
+      const item =
+        document.createElement(
+          'div'
+        );
 
+      item.className =
+        'recent-item-wrapper';
+
+      item.style.display =
+        'flex';
+
+      item.style.alignItems =
+        'center';
+
+      item.style.gap =
+        '6px';
 
       const botao =
         document.createElement(
           'button'
         );
 
-
       botao.className =
         'recent-item';
-
 
       botao.textContent =
         conversa.title;
 
+      botao.style.flex =
+        '1';
+
+      botao.style.minWidth =
+        '0';
 
       if (
         conversa.id ===
         conversaAtual
       ) {
-
         botao.classList.add(
           'active'
         );
-
       }
-
 
       botao.addEventListener(
         'click',
         () => {
-
           selecionarConversa(
             conversa.id
           );
-
         }
       );
 
+      const excluir =
+        document.createElement(
+          'button'
+        );
 
-      recentes.appendChild(
+      excluir.type = 'button';
+
+      excluir.className =
+        'delete-conversation-btn';
+
+      excluir.textContent = '🗑️';
+
+      excluir.title =
+        'Excluir conversa';
+
+      excluir.setAttribute(
+        'aria-label',
+        `Excluir conversa ${conversa.title}`
+      );
+
+      excluir.style.border =
+        'none';
+
+      excluir.style.background =
+        'transparent';
+
+      excluir.style.cursor =
+        'pointer';
+
+      excluir.style.padding =
+        '6px';
+
+      excluir.style.flexShrink =
+        '0';
+
+      excluir.addEventListener(
+        'click',
+        event => {
+          event.stopPropagation();
+
+          excluirConversa(
+            conversa.id
+          );
+        }
+      );
+
+      item.appendChild(
         botao
       );
 
-    });
+      item.appendChild(
+        excluir
+      );
 
+      recentes.appendChild(
+        item
+      );
+    });
 }
 
 
 function renderizarMensagens() {
-
   if (!usuarioAtual) {
-
     mensagens.innerHTML =
       mensagemSemLogin();
 
     campo.disabled = true;
 
     return;
-
   }
-
 
   campo.disabled = false;
 
-
   if (!conversaAtual) {
-
     mensagens.innerHTML = `
-
       <div class="message-row">
 
         ${avatarMovi()}
@@ -639,16 +658,12 @@ function renderizarMensagens() {
         </div>
 
       </div>
-
     `;
 
     return;
-
   }
 
-
   let html = `
-
     <div class="message-row">
 
       ${avatarMovi()}
@@ -664,20 +679,14 @@ function renderizarMensagens() {
       </div>
 
     </div>
-
   `;
-
 
   mensagensAtuais
     .forEach(msg => {
-
-
       if (
         msg.role === 'user'
       ) {
-
         html += `
-
           <div class="message-row user">
 
             <div class="message-column">
@@ -703,13 +712,9 @@ function renderizarMensagens() {
             </div>
 
           </div>
-
         `;
-
       } else {
-
         html += `
-
           <div class="message-row">
 
             ${avatarMovi()}
@@ -735,21 +740,14 @@ function renderizarMensagens() {
             </div>
 
           </div>
-
         `;
-
       }
-
     });
 
-
-  mensagens.innerHTML =
-    html;
-
+  mensagens.innerHTML = html;
 
   mensagens.scrollTop =
     mensagens.scrollHeight;
-
 }
 
 
@@ -758,19 +756,12 @@ function renderizarMensagens() {
 /* ========================= */
 
 function montarHistorico() {
-
   return mensagensAtuais.map(
     msg => ({
-
-      role:
-        msg.role,
-
-      content:
-        msg.content
-
+      role: msg.role,
+      content: msg.content
     })
   );
-
 }
 
 
@@ -782,37 +773,28 @@ async function perguntarMovi(
   pergunta,
   historico
 ) {
-
   const resposta =
     await fetch(
       `${API_URL}/chat`,
       {
-
         method: 'POST',
 
         headers: {
-
           'Content-Type':
             'application/json'
-
         },
 
         body: JSON.stringify({
-
           pergunta:
             pergunta,
 
           historico:
             historico
-
         })
-
       }
     );
 
-
   if (!resposta.ok) {
-
     const erro =
       await resposta
         .json()
@@ -820,20 +802,13 @@ async function perguntarMovi(
           () => null
         );
 
-
     throw new Error(
-
       erro?.detail ||
-
       'Não foi possível consultar o Movi.'
-
     );
-
   }
 
-
   return await resposta.json();
-
 }
 
 
@@ -844,69 +819,45 @@ async function perguntarMovi(
 formulario.addEventListener(
   'submit',
   async event => {
-
-
     event.preventDefault();
 
-
     if (!usuarioAtual) {
-
       abrirAuth('login');
-
       return;
-
     }
-
 
     const texto =
       campo.value.trim();
-
 
     if (!texto) {
       return;
     }
 
-
     if (!conversaAtual) {
-
       await criarConversa();
-
     }
-
 
     if (!conversaAtual) {
       return;
     }
 
-
     const historico =
       montarHistorico();
 
-
     campo.value = '';
-
     campo.disabled = true;
 
-
     try {
-
-
       const mensagemUsuario =
         await salvarMensagem(
-
           conversaAtual,
-
           'user',
-
           texto
-
         );
-
 
       mensagensAtuais.push(
         mensagemUsuario
       );
-
 
       const conversa =
         conversas.find(
@@ -915,35 +866,28 @@ formulario.addEventListener(
             conversaAtual
         );
 
-
       if (
         conversa &&
         conversa.title ===
           'Nova conversa'
       ) {
-
         const titulo =
           texto.slice(
             0,
             28
           );
 
-
         await atualizarTituloConversa(
           conversaAtual,
           titulo
         );
-
       }
-
 
       await atualizarDataConversa(
         conversaAtual
       );
 
-
       renderizarMensagens();
-
 
       const dados =
         await perguntarMovi(
@@ -951,43 +895,30 @@ formulario.addEventListener(
           historico
         );
 
-
       const mensagemMovi =
         await salvarMensagem(
-
           conversaAtual,
-
           'assistant',
-
           dados.resposta
-
         );
-
 
       mensagensAtuais.push(
         mensagemMovi
       );
 
-
       await atualizarDataConversa(
         conversaAtual
       );
 
-
       renderizarMensagens();
 
-
     } catch (erro) {
-
-
       console.error(
         'Erro:',
         erro
       );
 
-
       mensagensAtuais.push({
-
         id:
           `erro-${Date.now()}`,
 
@@ -999,22 +930,14 @@ formulario.addEventListener(
 
         created_at:
           new Date().toISOString()
-
       });
-
 
       renderizarMensagens();
 
-
     } finally {
-
-
       campo.disabled = false;
-
       campo.focus();
-
     }
-
   }
 );
 
@@ -1044,11 +967,9 @@ document
   .addEventListener(
     'click',
     () => {
-
       document.body
         .classList
         .toggle('dark');
-
     }
   );
 
@@ -1060,12 +981,9 @@ document
 busca.addEventListener(
   'input',
   () => {
-
-
     const termo =
       busca.value
         .toLowerCase();
-
 
     document
       .querySelectorAll(
@@ -1073,10 +991,7 @@ busca.addEventListener(
       )
       .forEach(
         balao => {
-
-
           balao.style.opacity =
-
             !termo ||
 
             balao.textContent
@@ -1086,10 +1001,8 @@ busca.addEventListener(
               ? '1'
 
               : '.22';
-
         }
       );
-
   }
 );
 
@@ -1208,7 +1121,6 @@ const googleLoginBtn =
     '#googleLoginBtn'
   );
 
-
 let authMode =
   'login';
 
@@ -1220,13 +1132,10 @@ let authMode =
 function mostrarUsuario(
   usuario
 ) {
-
   usuarioAtual =
     usuario;
 
-
   const nome =
-
     usuario
       .user_metadata
       ?.full_name ||
@@ -1240,9 +1149,7 @@ function mostrarUsuario(
 
     'Usuário';
 
-
   const foto =
-
     usuario
       .user_metadata
       ?.avatar_url ||
@@ -1253,143 +1160,102 @@ function mostrarUsuario(
 
     null;
 
-
   const inicial =
     nome
       .charAt(0)
       .toUpperCase();
 
-
   profileName.textContent =
     nome;
-
 
   profileEmail.textContent =
     usuario.email ||
     'Conta conectada';
 
-
   if (foto) {
-
-
     profileAvatarImage.src =
       foto;
-
 
     profileBtnImage.src =
       foto;
 
-
     profileAvatarImage.hidden =
       false;
-
 
     profileBtnImage.hidden =
       false;
 
-
     profileAvatarLetter.hidden =
       true;
 
-
     profileBtnLetter.hidden =
       true;
-
-
   } else {
-
-
     profileAvatarImage.hidden =
       true;
-
 
     profileBtnImage.hidden =
       true;
 
-
     profileAvatarLetter.hidden =
       false;
 
-
     profileBtnLetter.hidden =
       false;
-
 
     profileAvatarLetter.textContent =
       inicial;
 
-
     profileBtnLetter.textContent =
       inicial;
-
   }
-
 
   loggedOutActions.hidden =
     true;
 
-
   loggedInActions.hidden =
     false;
-
 }
 
 
 function mostrarDesconectado() {
-
   usuarioAtual = null;
-
   conversaAtual = null;
-
   conversas = [];
-
   mensagensAtuais = [];
-
 
   profileName.textContent =
     'Minha conta';
 
-
   profileEmail.textContent =
     'Entre para salvar seu perfil';
-
 
   profileAvatarImage.hidden =
     true;
 
-
   profileBtnImage.hidden =
     true;
-
 
   profileAvatarLetter.hidden =
     false;
 
-
   profileBtnLetter.hidden =
     false;
-
 
   profileAvatarLetter.textContent =
     'M';
 
-
   profileBtnLetter.textContent =
     'M';
-
 
   loggedOutActions.hidden =
     false;
 
-
   loggedInActions.hidden =
     true;
 
-
   renderizarRecentes();
-
   renderizarMensagens();
-
 }
 
 
@@ -1400,14 +1266,11 @@ function mostrarDesconectado() {
 function configurarAuth(
   modo
 ) {
-
   authMode =
     modo;
 
-
   const cadastro =
     modo === 'register';
-
 
   authOverlay
     .classList
@@ -1416,60 +1279,35 @@ function configurarAuth(
       cadastro
     );
 
-
   authTitle.textContent =
-
     cadastro
-
       ? 'Criar sua conta'
-
       : 'Entrar no Movi';
 
-
   authSubtitle.textContent =
-
     cadastro
-
       ? 'Crie uma conta para manter seu perfil e suas conversas organizadas.'
-
       : 'Acesse sua conta para manter suas conversas salvas.';
 
-
   authSubmit.textContent =
-
     cadastro
-
       ? 'Criar conta'
-
       : 'Entrar';
 
-
   authSwitchText.textContent =
-
     cadastro
-
       ? 'Já tem uma conta?'
-
       : 'Ainda não tem uma conta?';
 
-
   authSwitchBtn.textContent =
-
     cadastro
-
       ? 'Entrar'
-
       : 'Criar conta';
 
-
   authPassword.autocomplete =
-
     cadastro
-
       ? 'new-password'
-
       : 'current-password';
-
 
   document
     .querySelector(
@@ -1477,28 +1315,23 @@ function configurarAuth(
     )
     .required =
       cadastro;
-
 }
 
 
 function abrirAuth(
   modo
 ) {
-
   configurarAuth(
     modo
   );
-
 
   profileMenu
     .classList
     .remove('open');
 
-
   authOverlay
     .classList
     .add('open');
-
 
   authOverlay
     .setAttribute(
@@ -1506,45 +1339,32 @@ function abrirAuth(
       'false'
     );
 
-
   setTimeout(
     () => {
-
-
       document
         .querySelector(
-
           modo ===
             'register'
-
             ? '#authName'
-
             : '#authEmail'
-
         )
         .focus();
-
-
     },
     50
   );
-
 }
 
 
 function fecharAuth() {
-
   authOverlay
     .classList
     .remove('open');
-
 
   authOverlay
     .setAttribute(
       'aria-hidden',
       'true'
     );
-
 }
 
 
@@ -1555,15 +1375,11 @@ function fecharAuth() {
 profileBtn.addEventListener(
   'click',
   event => {
-
-
     event.stopPropagation();
-
 
     profileMenu
       .classList
       .toggle('open');
-
   }
 );
 
@@ -1575,11 +1391,9 @@ document
   .addEventListener(
     'click',
     () => {
-
       abrirAuth(
         'login'
       );
-
     }
   );
 
@@ -1591,11 +1405,9 @@ document
   .addEventListener(
     'click',
     () => {
-
       abrirAuth(
         'register'
       );
-
     }
   );
 
@@ -1609,19 +1421,12 @@ authClose.addEventListener(
 authSwitchBtn.addEventListener(
   'click',
   () => {
-
-
     configurarAuth(
-
       authMode ===
         'login'
-
         ? 'register'
-
         : 'login'
-
     );
-
   }
 );
 
@@ -1629,17 +1434,12 @@ authSwitchBtn.addEventListener(
 authOverlay.addEventListener(
   'click',
   event => {
-
-
     if (
       event.target ===
       authOverlay
     ) {
-
       fecharAuth();
-
     }
-
   }
 );
 
@@ -1647,8 +1447,6 @@ authOverlay.addEventListener(
 document.addEventListener(
   'click',
   event => {
-
-
     if (
       !profileMenu
         .contains(
@@ -1660,13 +1458,10 @@ document.addEventListener(
       event.target !==
         profileBtn
     ) {
-
       profileMenu
         .classList
         .remove('open');
-
     }
-
   }
 );
 
@@ -1674,17 +1469,12 @@ document.addEventListener(
 document.addEventListener(
   'keydown',
   event => {
-
-
     if (
       event.key ===
       'Escape'
     ) {
-
       fecharAuth();
-
     }
-
   }
 );
 
@@ -1697,42 +1487,31 @@ googleLoginBtn
   .addEventListener(
     'click',
     async () => {
-
-
       const {
         error
       } =
         await supabaseClient
           .auth
           .signInWithOAuth({
-
             provider:
               'google',
 
             options: {
-
               redirectTo:
                 window.location.origin
-
             }
-
           });
 
-
       if (error) {
-
         console.error(
           'Erro ao entrar com Google:',
           error.message
         );
 
-
         alert(
           'Não foi possível entrar com Google.'
         );
-
       }
-
     }
   );
 
@@ -1744,8 +1523,6 @@ googleLoginBtn
 logoutBtn.addEventListener(
   'click',
   async () => {
-
-
     const {
       error
     } =
@@ -1753,31 +1530,24 @@ logoutBtn.addEventListener(
         .auth
         .signOut();
 
-
     if (error) {
-
       console.error(
         'Erro ao sair:',
         error.message
       );
-
 
       alert(
         'Não foi possível sair da conta.'
       );
 
       return;
-
     }
 
-
     mostrarDesconectado();
-
 
     profileMenu
       .classList
       .remove('open');
-
   }
 );
 
@@ -1789,10 +1559,7 @@ logoutBtn.addEventListener(
 authForm.addEventListener(
   'submit',
   async event => {
-
-
     event.preventDefault();
-
 
     const nome =
       document
@@ -1802,7 +1569,6 @@ authForm.addEventListener(
         .value
         .trim();
 
-
     const email =
       document
         .querySelector(
@@ -1811,24 +1577,17 @@ authForm.addEventListener(
         .value
         .trim();
 
-
     const senha =
       authPassword.value;
-
 
     authSubmit.disabled =
       true;
 
-
     try {
-
-
       if (
         authMode ===
         'register'
       ) {
-
-
         const {
           data,
           error
@@ -1836,7 +1595,6 @@ authForm.addEventListener(
           await supabaseClient
             .auth
             .signUp({
-
               email:
                 email,
 
@@ -1844,99 +1602,68 @@ authForm.addEventListener(
                 senha,
 
               options: {
-
                 data: {
-
                   full_name:
                     nome
-
                 }
-
               }
-
             });
-
 
         if (error) {
           throw error;
         }
 
-
         if (
           data.session
         ) {
-
           fecharAuth();
-
         } else {
-
           alert(
             'Conta criada. Verifique seu e-mail para confirmar o cadastro.'
           );
-
         }
-
-
       } else {
-
-
         const {
           error
         } =
           await supabaseClient
             .auth
             .signInWithPassword({
-
               email:
                 email,
 
               password:
                 senha
-
             });
-
 
         if (error) {
           throw error;
         }
 
-
         fecharAuth();
-
       }
-
 
       authForm.reset();
 
-
     } catch (erro) {
-
-
       console.error(
         'Erro na autenticação:',
         erro
       );
-
 
       alert(
         erro.message ||
         'Não foi possível concluir a autenticação.'
       );
 
-
     } finally {
-
-
       authSubmit.disabled =
         false;
-
 
       configurarAuth(
         authMode
       );
-
     }
-
   }
 );
 
@@ -1946,7 +1673,6 @@ authForm.addEventListener(
 /* ========================= */
 
 async function iniciarSessao() {
-
   const {
     data: {
       session
@@ -1957,41 +1683,28 @@ async function iniciarSessao() {
       .auth
       .getSession();
 
-
   if (error) {
-
     console.error(
       'Erro ao verificar sessão:',
       error.message
     );
 
-
     mostrarDesconectado();
 
     return;
-
   }
-
 
   if (
     session?.user
   ) {
-
     mostrarUsuario(
       session.user
     );
 
-
     await carregarConversas();
-
-
   } else {
-
-
     mostrarDesconectado();
-
   }
-
 }
 
 
@@ -2004,53 +1717,34 @@ supabaseClient
       event,
       session
     ) => {
-
-
       setTimeout(
         async () => {
-
-
           if (
             session?.user
           ) {
-
-
             const mudouUsuario =
               usuarioAtual?.id !==
               session.user.id;
-
 
             mostrarUsuario(
               session.user
             );
 
-
             fecharAuth();
-
 
             if (
               mudouUsuario ||
               event ===
                 'SIGNED_IN'
             ) {
-
               await carregarConversas();
-
             }
-
-
           } else {
-
-
             mostrarDesconectado();
-
           }
-
-
         },
         0
       );
-
     }
   );
 
