@@ -11,7 +11,7 @@ BASE_VETORIAL = PASTA_BACKEND / "base_vetorial"
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-MODELO_LLM = "llama-3.3-70b-versatile"
+MODELO_LLM = "openai/gpt-oss-120b"
 MODELO_EMBEDDING = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 TAMANHO_CHUNK = 800
