@@ -2,7 +2,7 @@ from typing import List, Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from LangGraph import perguntar_movi
 
@@ -14,12 +14,16 @@ app = FastAPI(
 )
 
 
+# Permite o frontend acessar a API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=[
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 
@@ -30,7 +34,7 @@ class MensagemHistorico(BaseModel):
 
 class PerguntaRequest(BaseModel):
     pergunta: str
-    historico: List[MensagemHistorico] = []
+    historico: List[MensagemHistorico] = Field(default_factory=list)
 
 
 @app.get("/")
@@ -43,12 +47,13 @@ def inicio():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok"
+    }
 
 
 @app.post("/chat")
 def chat(dados: PerguntaRequest):
-
     pergunta = dados.pergunta.strip()
 
     if not pergunta:

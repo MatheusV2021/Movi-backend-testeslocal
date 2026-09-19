@@ -4,7 +4,7 @@ const campo = document.querySelector('#messageInput');
 const recentes = document.querySelector('#recentList');
 const busca = document.querySelector('#searchInput');
 
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://movi-backend-testeslocal.onrender.com';
 
 
 /* ========================= */
