@@ -887,13 +887,17 @@ formulario.addEventListener(
         conversaAtual
       );
 
-      renderizarMensagens();
+renderizarMensagens();
 
-      const dados =
-        await perguntarMovi(
-          texto,
-          historico
-        );
+mostrarMoviDigitando();
+
+const dados =
+  await perguntarMovi(
+    texto,
+    historico
+  );
+
+removerMoviDigitando();
 
       const mensagemMovi =
         await salvarMensagem(
@@ -1754,3 +1758,69 @@ supabaseClient
 /* ========================= */
 
 iniciarSessao();
+
+
+function mostrarMoviDigitando() {
+
+  removerMoviDigitando();
+
+  const digitando =
+    document.createElement(
+      'div'
+    );
+
+  digitando.id =
+    'moviDigitando';
+
+  digitando.className =
+    'message-row movi-typing';
+
+  digitando.innerHTML = `
+    <div class="bot-avatar typing-avatar">
+
+      <img
+        src="assets/img/3.png"
+        alt="Movi"
+        onerror="this.style.display='none'; this.parentElement.textContent='🦫'"
+      >
+
+    </div>
+
+    <div class="message-column">
+
+      <div class="bubble typing-bubble">
+
+        <span class="typing-text">
+          Movi está digitando
+        </span>
+
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  mensagens.appendChild(
+    digitando
+  );
+
+  mensagens.scrollTop =
+    mensagens.scrollHeight;
+}
+
+
+function removerMoviDigitando() {
+  const digitando =
+    document.querySelector(
+      '#moviDigitando'
+    );
+
+  if (digitando) {
+    digitando.remove();
+  }
+}
